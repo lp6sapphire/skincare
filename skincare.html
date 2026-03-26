@@ -1,0 +1,411 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="theme-color" content="#faf6f1">
+<link rel="apple-touch-icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>✨</text></svg>">
+<title>Skin Routine</title>
+<link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600&family=Fraunces:ital,opsz,wght@0,9..144,300;0,9..144,400;1,9..144,300&display=swap" rel="stylesheet">
+<style>
+:root {
+  --bg:#faf6f1; --card:rgba(255,255,255,.82); --card-solid:#fff;
+  --border:rgba(180,160,140,.18); --border-strong:rgba(180,160,140,.3);
+  --text:#2c2018; --text2:#7a6b5d; --text3:#b0a090;
+  --accent:#c8956c; --accent-soft:rgba(200,149,108,.12);
+  --ret:#7868b0; --ret-bg:rgba(120,104,176,.1);
+  --acid:#c06848; --acid-bg:rgba(192,104,72,.1);
+  --spf:#5a8a40; --spf-bg:rgba(90,138,64,.1);
+  --azel:#4888a0; --azel-bg:rgba(72,136,160,.1);
+  --mask:#9a8840; --mask-bg:rgba(154,136,64,.1);
+  --new:#c8956c; --new-bg:rgba(200,149,108,.12);
+  --warn-y:#d4a020; --warn-o:#d07830; --warn-r:#c04030; --ok:#4a9050; --info:#4070b0;
+  --radius:20px; --radius-sm:14px; --radius-xs:10px;
+  --safe-b:env(safe-area-inset-bottom, 0px);
+}
+/* ── DARK THEME (evening) ── */
+html.dark{
+  --bg:#1a1614; --card:rgba(40,34,30,.82); --card-solid:#262120;
+  --border:rgba(120,100,80,.2); --border-strong:rgba(120,100,80,.35);
+  --text:#ede4da; --text2:#a09585; --text3:#6a5e52;
+  --accent:#d4a878; --accent-soft:rgba(212,168,120,.15);
+  --ret:#a090d0; --ret-bg:rgba(160,144,208,.15);
+  --acid:#e08868; --acid-bg:rgba(224,136,104,.12);
+  --spf:#7ab060; --spf-bg:rgba(122,176,96,.12);
+  --azel:#68b0c8; --azel-bg:rgba(104,176,200,.12);
+  --mask:#c0b060; --mask-bg:rgba(192,176,96,.12);
+  --new:#d4a878; --new-bg:rgba(212,168,120,.15);
+}
+
+*{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent;-webkit-font-smoothing:antialiased;}
+html{height:100%;overflow:hidden;background:#faf6f1;background:var(--bg);}
+body{font-family:'Outfit',sans-serif;background:var(--bg);color:var(--text);height:100%;overflow:hidden;position:relative;transition:background .5s ease,color .5s ease;}
+body::before{content:'';position:fixed;inset:0;pointer-events:none;z-index:0;opacity:0;background:radial-gradient(ellipse at 30% 0%,rgba(180,130,80,.12),transparent 55%),radial-gradient(ellipse at 80% 100%,rgba(120,90,160,.08),transparent 50%);transition:opacity .5s ease;}
+html.dark body::before{opacity:1;}
+
+/* ── APP SHELL ── */
+.app{height:100%;display:flex;flex-direction:column;position:relative;z-index:1;background:var(--bg);}
+.page-container{flex:1;overflow:hidden;position:relative;background:var(--bg);}
+.page{position:absolute;inset:0;overflow-y:auto;-webkit-overflow-scrolling:touch;opacity:0;transform:translateX(20px);transition:opacity .3s ease,transform .3s ease;pointer-events:none;padding-bottom:calc(80px + var(--safe-b));background:var(--bg);}
+.page.active{opacity:1;transform:translateX(0);pointer-events:auto;min-height:100%;}
+
+/* ── GLASS HEADER ── */
+.glass-header{position:sticky;top:0;z-index:50;padding:max(env(safe-area-inset-top, 12px), 12px) 20px 0;background:rgba(250,246,241,.85);-webkit-backdrop-filter:blur(20px) saturate(1.5);backdrop-filter:blur(20px) saturate(1.5);border-bottom:1px solid var(--border);transition:background .5s ease;}
+.dark .glass-header{background:rgba(26,22,20,.88);}
+
+/* ── TITLE ROW ── */
+.title-row{display:flex;justify-content:space-between;align-items:center;margin-bottom:16px;}
+.logo{display:flex;align-items:baseline;gap:6px;}
+.logo-text{font-family:'Fraunces',serif;font-size:24px;font-weight:300;color:var(--text);letter-spacing:-.02em;transition:color .5s;}
+.logo-text i{font-style:italic;color:var(--accent);font-weight:300;transition:color .5s;}
+.week-pill{font-size:11px;font-weight:500;color:var(--accent);background:var(--accent-soft);padding:4px 10px;border-radius:20px;letter-spacing:.03em;transition:all .5s;}
+
+/* ── SEGMENTED CONTROL ── */
+.seg{display:flex;background:rgba(180,160,140,.12);border-radius:12px;padding:3px;margin-bottom:14px;transition:background .5s;}
+.dark .seg{background:rgba(100,80,60,.2);}
+.seg button{flex:1;padding:9px 0;border:none;border-radius:10px;background:transparent;font-family:'Outfit',sans-serif;font-size:13.5px;font-weight:400;color:var(--text2);cursor:pointer;transition:all .25s ease;position:relative;}
+.seg button.on{background:var(--card-solid);color:var(--text);font-weight:500;box-shadow:0 1px 8px rgba(0,0,0,.06),0 0 1px rgba(0,0,0,.1);}
+.dark .seg button.on{box-shadow:0 1px 8px rgba(0,0,0,.3),0 0 1px rgba(0,0,0,.4);}
+.seg-week{margin-bottom:14px;}
+
+/* ── DAY PILLS ── */
+.days{display:flex;gap:6px;padding:0 20px 14px 0;overflow-x:auto;scrollbar-width:none;-webkit-overflow-scrolling:touch;}
+.days::after{content:'';flex-shrink:0;width:1px;}
+.days::-webkit-scrollbar{display:none;}
+.day-pill{flex-shrink:0;display:flex;flex-direction:column;align-items:center;gap:3px;padding:8px 14px;border-radius:16px;border:none;background:transparent;cursor:pointer;transition:all .25s ease;font-family:'Outfit',sans-serif;}
+.day-pill .dp-icon{font-size:16px;line-height:1;transition:transform .25s;}
+.day-pill .dp-label{font-size:10px;font-weight:600;letter-spacing:.1em;text-transform:uppercase;color:var(--text3);transition:color .2s;}
+.day-pill.on{background:var(--text);box-shadow:0 4px 12px rgba(44,32,24,.2);}
+.dark .day-pill.on{background:var(--accent);box-shadow:0 4px 16px rgba(212,168,120,.25);}
+.day-pill.on .dp-label{color:rgba(255,255,255,.8);}
+.dark .day-pill.on .dp-label{color:rgba(26,22,20,.85);}
+.day-pill.on .dp-icon{transform:scale(1.15);}
+
+/* ── CONTENT ── */
+.scroll-content{padding:20px 16px 20px;background:var(--bg);}
+
+/* ── DAY HERO ── */
+.hero{margin-bottom:20px;}
+.hero-day{font-family:'Fraunces',serif;font-size:30px;font-weight:300;color:var(--text);line-height:1.1;}
+.hero-type{font-size:12px;font-weight:500;color:var(--text2);letter-spacing:.06em;text-transform:uppercase;margin-top:4px;}
+.hero-meta{display:flex;gap:8px;margin-top:12px;flex-wrap:wrap;}
+.meta-chip{display:inline-flex;align-items:center;gap:5px;font-size:12px;font-weight:500;color:var(--text2);background:var(--card);border:1px solid var(--border);border-radius:20px;padding:5px 12px;-webkit-backdrop-filter:blur(8px);backdrop-filter:blur(8px);}
+.meta-chip.week-chip{background:var(--text);color:rgba(255,255,255,.85);border-color:transparent;}
+.dark .meta-chip.week-chip{background:var(--accent);color:rgba(26,22,20,.9);}
+
+/* ── STEP CARDS ── */
+.steps-list{display:flex;flex-direction:column;gap:10px;}
+.scard{background:var(--card);border:1px solid var(--border);border-radius:var(--radius);overflow:hidden;-webkit-backdrop-filter:blur(10px);backdrop-filter:blur(10px);animation:slideUp .35s ease both;transition:background .5s,border-color .5s;}
+@keyframes slideUp{from{opacity:0;transform:translateY(12px)}to{opacity:1;transform:translateY(0)}}
+.scard:nth-child(1){animation-delay:.03s}.scard:nth-child(2){animation-delay:.07s}.scard:nth-child(3){animation-delay:.11s}.scard:nth-child(4){animation-delay:.15s}.scard:nth-child(5){animation-delay:.19s}.scard:nth-child(6){animation-delay:.22s}.scard:nth-child(7){animation-delay:.25s}.scard:nth-child(8){animation-delay:.28s}
+
+.scard-top{display:flex;align-items:center;gap:12px;padding:14px 16px;cursor:pointer;user-select:none;}
+.scard-num{width:30px;height:30px;border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:600;flex-shrink:0;transition:transform .2s;}
+.morning .scard-num{background:linear-gradient(135deg,#fff3e0,#ffe0b0);color:#a06020;}
+.evening .scard-num{background:linear-gradient(135deg,#ede8f5,#d8d0f0);color:#6040a0;}
+.dark .evening .scard-num{background:linear-gradient(135deg,#302848,#3a2860);color:#c0b0e8;}
+.dark .morning .scard-num{background:linear-gradient(135deg,#3a2e20,#4a3820);color:#e0b870;}
+.scard-info{flex:1;min-width:0;}
+.scard-name{font-size:14.5px;font-weight:500;color:var(--text);display:flex;align-items:center;gap:6px;flex-wrap:wrap;line-height:1.35;}
+.scard-brand{font-size:12px;color:var(--text3);margin-top:2px;}
+.scard-arrow{width:24px;height:24px;border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:14px;color:var(--text3);background:rgba(180,160,140,.08);transition:all .25s;flex-shrink:0;}
+.dark .scard-arrow{background:rgba(120,100,80,.15);}
+.scard.open .scard-arrow{background:var(--accent-soft);color:var(--accent);transform:rotate(90deg);}
+
+.scard-body{max-height:0;overflow:hidden;transition:max-height .35s ease;}
+.scard.open .scard-body{max-height:600px;}
+.scard-inner{padding:0 16px 16px;display:flex;flex-direction:column;gap:8px;border-top:1px solid var(--border);margin:0 16px;padding-top:12px;}
+.scard-inner .row{display:flex;gap:10px;font-size:13px;line-height:1.6;}
+.scard-inner .row-i{width:22px;flex-shrink:0;text-align:center;font-size:14px;margin-top:1px;}
+.scard-inner .row-t{color:#5a4a3a;}
+.dark .scard-inner .row-t{color:#b0a090;}
+.scard-inner .row-t strong{color:var(--text);font-weight:500;}
+
+/* ── BADGES ── */
+.tag{font-size:9px;font-weight:600;letter-spacing:.08em;text-transform:uppercase;padding:3px 7px;border-radius:6px;white-space:nowrap;}
+.tag-new{background:var(--new-bg);color:var(--new);}
+.tag-acid{background:var(--acid-bg);color:var(--acid);}
+.tag-ret{background:var(--ret-bg);color:var(--ret);}
+.tag-spf{background:var(--spf-bg);color:var(--spf);}
+.tag-azel{background:var(--azel-bg);color:var(--azel);}
+.tag-mask{background:var(--mask-bg);color:var(--mask);}
+
+/* ── LEGEND ── */
+.legend-bar{margin-top:20px;padding:16px;background:var(--card);border:1px solid var(--border);border-radius:var(--radius);-webkit-backdrop-filter:blur(10px);backdrop-filter:blur(10px);transition:background .5s,border-color .5s;}
+.legend-bar h4{font-size:11px;font-weight:600;color:var(--text3);text-transform:uppercase;letter-spacing:.08em;margin-bottom:10px;}
+.legend-items{display:flex;flex-wrap:wrap;gap:8px;}
+.legend-items span{display:flex;align-items:center;gap:5px;font-size:12px;color:var(--text2);}
+
+/* ── TIPS PAGE ── */
+.tips-hero{padding:max(env(safe-area-inset-top, 16px), 16px) 20px 16px;background:rgba(250,246,241,.85);-webkit-backdrop-filter:blur(20px);backdrop-filter:blur(20px);border-bottom:1px solid var(--border);position:sticky;top:0;z-index:50;transition:background .5s;}
+.dark .tips-hero{background:rgba(26,22,20,.88);}
+.tips-title{font-family:'Fraunces',serif;font-size:26px;font-weight:300;color:var(--text);}
+.tips-title i{font-style:italic;color:var(--accent);}
+
+.tips-body{padding:20px 16px 20px;}
+.tips-section{font-family:'Fraunces',serif;font-size:22px;font-weight:300;color:var(--text);margin-bottom:16px;}
+.tips-sub{font-size:12px;font-weight:500;color:var(--text3);text-transform:uppercase;letter-spacing:.06em;margin-bottom:20px;}
+.tips-divider{height:1px;background:var(--border-strong);margin:28px 0;}
+
+/* ── ALERT CARDS ── */
+.alert{margin-bottom:12px;border-radius:var(--radius);overflow:hidden;animation:slideUp .3s ease both;}
+.alert-top{display:flex;align-items:center;gap:10px;padding:14px 16px;cursor:pointer;user-select:none;border:1px solid;border-radius:var(--radius);transition:border-radius .2s;}
+.alert.open .alert-top{border-radius:var(--radius) var(--radius) 0 0;border-bottom:none;}
+.al-y .alert-top{background:rgba(212,160,32,.08);border-color:rgba(212,160,32,.2);}
+.al-o .alert-top{background:rgba(208,120,48,.08);border-color:rgba(208,120,48,.2);}
+.al-r .alert-top{background:rgba(192,64,48,.08);border-color:rgba(192,64,48,.2);}
+.al-g .alert-top{background:rgba(74,144,80,.08);border-color:rgba(74,144,80,.2);}
+.al-b .alert-top{background:rgba(64,112,176,.08);border-color:rgba(64,112,176,.2);}
+.dark .al-y .alert-top{background:rgba(212,160,32,.12);border-color:rgba(212,160,32,.25);}
+.dark .al-o .alert-top{background:rgba(208,120,48,.12);border-color:rgba(208,120,48,.25);}
+.dark .al-r .alert-top{background:rgba(192,64,48,.12);border-color:rgba(192,64,48,.25);}
+.dark .al-g .alert-top{background:rgba(74,144,80,.12);border-color:rgba(74,144,80,.25);}
+.dark .al-b .alert-top{background:rgba(64,112,176,.12);border-color:rgba(64,112,176,.25);}
+.al-emoji{font-size:22px;flex-shrink:0;}
+.al-wrap{flex:1;}
+.al-title{font-size:14.5px;font-weight:500;line-height:1.3;}
+.al-y .al-title{color:#8a6a10;} .al-o .al-title{color:#8a4a18;} .al-r .al-title{color:#8a2820;} .al-g .al-title{color:#2a6830;} .al-b .al-title{color:#2a4870;}
+.dark .al-y .al-title{color:#e0c060;} .dark .al-o .al-title{color:#e09060;} .dark .al-r .al-title{color:#e07060;} .dark .al-g .al-title{color:#70c080;} .dark .al-b .al-title{color:#70a0d0;}
+.al-sub{font-size:11.5px;color:var(--text3);margin-top:2px;}
+.al-arrow{font-size:16px;color:var(--text3);transition:transform .25s;flex-shrink:0;}
+.alert.open .al-arrow{transform:rotate(90deg);}
+
+.al-body{max-height:0;overflow:hidden;transition:max-height .35s ease;}
+.alert.open .al-body{max-height:2000px;}
+.al-y .al-body{border:1px solid rgba(212,160,32,.2);border-top:none;border-radius:0 0 var(--radius) var(--radius);}
+.al-o .al-body{border:1px solid rgba(208,120,48,.2);border-top:none;border-radius:0 0 var(--radius) var(--radius);}
+.al-r .al-body{border:1px solid rgba(192,64,48,.2);border-top:none;border-radius:0 0 var(--radius) var(--radius);}
+.al-g .al-body{border:1px solid rgba(74,144,80,.2);border-top:none;border-radius:0 0 var(--radius) var(--radius);}
+.al-b .al-body{border:1px solid rgba(64,112,176,.2);border-top:none;border-radius:0 0 var(--radius) var(--radius);}
+.dark .al-y .al-body{border-color:rgba(212,160,32,.25);}
+.dark .al-o .al-body{border-color:rgba(208,120,48,.25);}
+.dark .al-r .al-body{border-color:rgba(192,64,48,.25);}
+.dark .al-g .al-body{border-color:rgba(74,144,80,.25);}
+.dark .al-b .al-body{border-color:rgba(64,112,176,.25);}
+.al-inner{padding:14px 16px 16px;background:var(--card-solid);transition:background .5s;}
+.al-label{font-size:11px;font-weight:600;letter-spacing:.07em;text-transform:uppercase;margin-bottom:8px;}
+.al-y .al-label{color:#8a6a10;}.al-o .al-label{color:#8a4a18;}.al-r .al-label{color:#8a2820;}.al-g .al-label{color:#2a6830;}.al-b .al-label{color:#2a4870;}
+.dark .al-y .al-label{color:#e0c060;}.dark .al-o .al-label{color:#e09060;}.dark .al-r .al-label{color:#e07060;}.dark .al-g .al-label{color:#70c080;}.dark .al-b .al-label{color:#70a0d0;}
+.al-list{display:flex;flex-direction:column;gap:6px;}
+.al-item{display:flex;gap:8px;font-size:13px;line-height:1.5;color:var(--text2);}
+.al-item strong{color:var(--text);font-weight:500;}
+.al-icon{width:20px;flex-shrink:0;text-align:center;margin-top:1px;}
+.al-action{background:var(--bg);border-radius:var(--radius-xs);padding:12px 14px;margin-top:12px;transition:background .5s;}
+.al-action-t{font-size:12px;font-weight:600;color:var(--text);margin-bottom:8px;}
+.al-steps{display:flex;flex-direction:column;gap:6px;}
+.al-step{display:flex;gap:8px;font-size:13px;line-height:1.5;color:var(--text2);}
+.al-step-n{width:22px;height:22px;border-radius:8px;flex-shrink:0;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:600;margin-top:1px;}
+.al-y .al-step-n{background:rgba(212,160,32,.12);color:#8a6a10;}
+.al-o .al-step-n{background:rgba(208,120,48,.12);color:#8a4a18;}
+.al-r .al-step-n{background:rgba(192,64,48,.12);color:#8a2820;}
+.al-g .al-step-n{background:rgba(74,144,80,.12);color:#2a6830;}
+.al-b .al-step-n{background:rgba(64,112,176,.12);color:#2a4870;}
+.dark .al-y .al-step-n{background:rgba(212,160,32,.2);color:#e0c060;}
+.dark .al-o .al-step-n{background:rgba(208,120,48,.2);color:#e09060;}
+.dark .al-r .al-step-n{background:rgba(192,64,48,.2);color:#e07060;}
+.dark .al-g .al-step-n{background:rgba(74,144,80,.2);color:#70c080;}
+.dark .al-b .al-step-n{background:rgba(64,112,176,.2);color:#70a0d0;}
+
+/* ── TIP CARDS ── */
+.tcard{background:var(--card);border:1px solid var(--border);border-radius:var(--radius);padding:16px;margin-bottom:12px;-webkit-backdrop-filter:blur(10px);backdrop-filter:blur(10px);transition:background .5s,border-color .5s;}
+.tcard-title{font-size:14px;font-weight:500;color:var(--text);display:flex;align-items:center;gap:8px;margin-bottom:8px;}
+.tcard-text{font-size:13px;line-height:1.65;color:var(--text2);}
+.tcard-text strong{color:var(--text);font-weight:500;}
+
+/* ── TAB BAR ── */
+.tabbar{display:flex;background:rgba(255,255,255,.9);-webkit-backdrop-filter:blur(24px) saturate(1.5);backdrop-filter:blur(24px) saturate(1.5);border-top:1px solid var(--border);padding:6px 0 max(8px, var(--safe-b));flex-shrink:0;transition:background .5s;}
+.dark .tabbar{background:rgba(26,22,20,.92);}
+.tabbar button{flex:1;display:flex;flex-direction:column;align-items:center;gap:3px;padding:6px 0;border:none;background:transparent;cursor:pointer;font-family:'Outfit',sans-serif;transition:all .2s;}
+.tabbar .tb-icon{font-size:22px;line-height:1;transition:transform .2s;}
+.tabbar .tb-label{font-size:10px;font-weight:500;letter-spacing:.04em;color:var(--text3);transition:color .2s;}
+.tabbar button.on .tb-label{color:var(--accent);font-weight:600;}
+.tabbar button.on .tb-icon{transform:scale(1.1);}
+</style>
+</head>
+<body>
+<div class="app">
+  <div class="page-container">
+
+    <!-- ═══ PAGE: ROUTINE ═══ -->
+    <div class="page active" id="pg-routine">
+      <div class="glass-header">
+        <div class="title-row">
+          <div class="logo"><span class="logo-text">skin <i>routine</i></span></div>
+          <div class="week-pill" id="week-pill"></div>
+        </div>
+        <div class="seg">
+          <button class="on" id="btn-am" onclick="setTime('am')">☀️ Утро</button>
+          <button id="btn-pm" onclick="setTime('pm')">🌙 Вечер</button>
+        </div>
+        <div class="seg seg-week" id="seg-week" style="display:none">
+          <button class="on" onclick="setWeek('A')">А</button>
+          <button onclick="setWeek('B')">Б</button>
+          <button onclick="setWeek('C')">В</button>
+        </div>
+        <div class="days" id="days-row"></div>
+      </div>
+      <div class="scroll-content" id="routine-out"></div>
+    </div>
+
+    <!-- ═══ PAGE: TIPS ═══ -->
+    <div class="page" id="pg-tips">
+      <div class="tips-hero"><div class="tips-title">skin <i>tips</i></div></div>
+      <div class="tips-body">
+        <div class="tips-section">⚠️ Сигналы кожи</div>
+        <div class="tips-sub">Что менять при признаках перегрузки</div>
+
+        <div class="alert al-y" onclick="this.classList.toggle('open')"><div class="alert-top"><div class="al-emoji">🟡</div><div class="al-wrap"><div class="al-title">Лёгкая стянутость после умывания</div><div class="al-sub">Первый сигнал · через 2–4 недели</div></div><div class="al-arrow">›</div></div><div class="al-body"><div class="al-inner"><div class="al-label">Признаки</div><div class="al-list"><div class="al-item"><span class="al-icon">→</span>Стянутость <strong>15–20 мин после умывания</strong>, проходит после крема</div><div class="al-item"><span class="al-icon">→</span>Кожа суше обычного, но <strong>без шелушения</strong></div><div class="al-item"><span class="al-icon">→</span>Тонер слегка пощипывает</div></div><div class="al-action"><div class="al-action-t">🔧 Что делать</div><div class="al-steps"><div class="al-step"><div class="al-step-n">1</div><strong>Убрать азелаиновую из среды.</strong> Среда = отдых.</div><div class="al-step"><div class="al-step-n">2</div>Наблюдать <strong>2 недели.</strong></div></div></div></div></div></div>
+
+        <div class="alert al-o" onclick="this.classList.toggle('open')"><div class="alert-top"><div class="al-emoji">🟠</div><div class="al-wrap"><div class="al-title">Шелушение и чувствительность</div><div class="al-sub">Средний сигнал · барьер ослаблен</div></div><div class="al-arrow">›</div></div><div class="al-body"><div class="al-inner"><div class="al-label">Признаки</div><div class="al-list"><div class="al-item"><span class="al-icon">→</span><strong>Мелкое шелушение</strong> на щеках, у носа, подбородке</div><div class="al-item"><span class="al-icon">→</span>Покраснение <strong>30+ мин</strong> после активов</div><div class="al-item"><span class="al-icon">→</span>SPF или крем <strong>щиплет</strong></div></div><div class="al-action"><div class="al-action-t">🔧 Что делать</div><div class="al-steps"><div class="al-step"><div class="al-step-n">1</div>Среда = отдых.</div><div class="al-step"><div class="al-step-n">2</div><strong>Убрать BHA из пятницы.</strong> Только вторник.</div><div class="al-step"><div class="al-step-n">3</div>Наблюдать <strong>2–3 недели.</strong></div></div></div></div></div></div>
+
+        <div class="alert al-r" onclick="this.classList.toggle('open')"><div class="alert-top"><div class="al-emoji">🔴</div><div class="al-wrap"><div class="al-title">Парадоксальная жирность Т-зоны</div><div class="al-sub">Серьёзный сигнал · барьер повреждён</div></div><div class="al-arrow">›</div></div><div class="al-body"><div class="al-inner"><div class="al-label">Признаки</div><div class="al-list"><div class="al-item"><span class="al-icon">→</span>Т-зона <strong>жирнее, чем до ухода</strong></div><div class="al-item"><span class="al-icon">→</span>Поры <strong>крупнее</strong> несмотря на BHA</div><div class="al-item"><span class="al-icon">→</span>Сухость на щеках + жирность на лбу</div><div class="al-item"><span class="al-icon">→</span>Воспалительные <strong>высыпания</strong></div></div><div class="al-action"><div class="al-action-t">🚨 Экстренный протокол</div><div class="al-steps"><div class="al-step"><div class="al-step-n">1</div><strong>Убрать ВСЕ активы на 7–10 дней.</strong> Только: очищение → тонер → B2 → крем → SPF.</div><div class="al-step"><div class="al-step-n">2</div>Возвращать <strong>по одному в неделю:</strong> азелаиновая → BHA → ретинол.</div><div class="al-step"><div class="al-step-n">3</div>На полную схему за <strong>4–5 недель.</strong></div></div></div></div></div></div>
+
+        <div class="alert al-r" onclick="this.classList.toggle('open')"><div class="alert-top"><div class="al-emoji">💫</div><div class="al-wrap"><div class="al-title">Ретиноидный дерматит</div><div class="al-sub">Реакция на ретинальдегид</div></div><div class="al-arrow">›</div></div><div class="al-body"><div class="al-inner"><div class="al-label">Признаки</div><div class="al-list"><div class="al-item"><span class="al-icon">→</span><strong>Жжение</strong> 30+ мин после ретинола</div><div class="al-item"><span class="al-icon">→</span><strong>Крупное шелушение</strong> пластами</div><div class="al-item"><span class="al-icon">→</span>Краснота вокруг глаз и губ</div></div><div class="al-action"><div class="al-action-t">🔧 Что делать</div><div class="al-steps"><div class="al-step"><div class="al-step-n">1</div><strong>Убрать оба ретиноида</strong> на 2 недели.</div><div class="al-step"><div class="al-step-n">2</div>Вернуть <strong>один</strong> — 1 раз/нед. Сэндвич-метод.</div><div class="al-step"><div class="al-step-n">3</div>Через 3–4 нед добавить второй.</div></div></div></div></div></div>
+
+        <div class="alert al-g" onclick="this.classList.toggle('open')"><div class="alert-top"><div class="al-emoji">✅</div><div class="al-wrap"><div class="al-title">Всё работает — можно усилить</div><div class="al-sub">Через 2–3 месяца без проблем</div></div><div class="al-arrow">›</div></div><div class="al-body"><div class="al-inner"><div class="al-label">Признаки</div><div class="al-list"><div class="al-item"><span class="al-icon">→</span>Кожа <strong>ровная, увлажнённая</strong></div><div class="al-item"><span class="al-icon">→</span>Поры <strong>менее заметны</strong></div><div class="al-item"><span class="al-icon">→</span>Нет покраснений</div><div class="al-item"><span class="al-icon">→</span>Т-зона <strong>не блестит</strong> к обеду</div></div><div class="al-action"><div class="al-action-t">⬆️ Что добавить</div><div class="al-steps"><div class="al-step"><div class="al-step-n">1</div><strong>Третья азелаиновая</strong> утром.</div><div class="al-step"><div class="al-step-n">2</div>Crystal Retinal 3 → <strong>6</strong>.</div><div class="al-step"><div class="al-step-n">3</div>Clear Mask → 1 раз/нед.</div></div></div></div></div></div>
+
+        <div class="tips-divider"></div>
+
+        <div class="alert al-b" onclick="this.classList.toggle('open')"><div class="alert-top"><div class="al-emoji">📊</div><div class="al-wrap"><div class="al-title">Лестница нагрузки</div><div class="al-sub">Полная → Лёгкая → Мин. → Экстренная</div></div><div class="al-arrow">›</div></div><div class="al-body"><div class="al-inner"><div class="al-list"><div class="al-item"><span class="al-icon">4</span><strong>Полная:</strong> ретинол 2×, BHA 2×, азелаиновая 2×, ротация вс.</div><div class="al-item"><span class="al-icon">3</span><strong>Лёгкая:</strong> ср = отдых, азелаиновая только сб.</div><div class="al-item"><span class="al-icon">2</span><strong>Минимальная:</strong> ср + пт = отдых.</div><div class="al-item"><span class="al-icon">1</span><strong>Экстренная:</strong> только база. 7–10 дней.</div></div><div class="al-action"><div class="al-action-t">🔄 Возврат</div><div class="al-steps"><div class="al-step"><div class="al-step-n">→</div>Экстренная → Мин. (2 нед) → Лёгкая (2 нед) → Полная.</div></div></div></div></div></div>
+
+        <div class="tips-divider"></div>
+        <div class="tips-section">💡 Советы</div>
+
+        <div class="tcard"><div class="tcard-title">🔄 Возврат активов</div><div class="tcard-text">Возвращать <strong>не раньше чем через 2 недели</strong>, один продукт в неделю. Порядок: азелаиновая → BHA → AHA → ретинол.</div></div>
+        <div class="tcard"><div class="tcard-title">🌡️ Сезонность</div><div class="tcard-text"><strong>Зима:</strong> M.A.D Night Cream чаще. BHA до 1 раз/нед.<br><br><strong>Лето:</strong> BHA 2× отлично. Азелаиновую можно утром. <strong>SPF каждые 2 часа.</strong></div></div>
+        <div class="tcard"><div class="tcard-title">🩺 К дерматологу</div><div class="tcard-text">Если после 2 недель без активов кожа <strong>не восстановилась</strong>. Если появились <strong>новые высыпания</strong>.</div></div>
+        <div class="tcard"><div class="tcard-title">🤰 Беременность</div><div class="tcard-text"><strong>Убрать оба ретиноида немедленно.</strong> Пн → азелаиновая. Чт → отдых или BHA (с врачом).</div></div>
+        <div class="tcard"><div class="tcard-title">⏰ Экспозиция</div><div class="tcard-text"><strong>Ретинол 20–30 мин</strong> на сухую кожу — обязательно.<br><strong>BHA 20 мин</strong> — ничего поверх. Иначе −40–60% эффективности.</div></div>
+        <div class="tcard"><div class="tcard-title">📍 Поры на носу</div><div class="tcard-text"><strong>Ma:nyo 60–90 сек массаж</strong> каждый вечер — главный инструмент. Круговые движения по крыльям. BHA и B2 усиливают.</div></div>
+        <div class="tcard"><div class="tcard-title">🧴 Кремы</div><div class="tcard-text"><strong>M.A.D Night</strong> — плотнее, для азелаиновой и отдыха. <strong>Ultra Moisturiser</strong> — легче, поверх ретинола и BHA.</div></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ═══ TAB BAR ═══ -->
+  <div class="tabbar">
+    <button class="on" onclick="go('routine')"><span class="tb-icon">✨</span><span class="tb-label">Уход</span></button>
+    <button onclick="go('tips')"><span class="tb-icon">💡</span><span class="tb-label">Советы</span></button>
+  </div>
+</div>
+
+<script>
+const P={manyo:{name:"Ma:nyo Pure Cleansing Oil",brand:"Ma:nyo Factory",icon:"🫧",badge:"new",instr:[{i:"🤲",t:"<strong>Руки и лицо — сухие.</strong> Нанести 2–3 нажатия на всё лицо."},{i:"⏱️",t:"<strong>Массаж 60–90 сек.</strong> На носу — акцент: круговые по крыльям."},{i:"💧",t:"Смочить руки → эмульгация. <strong>Смыть тёплой водой.</strong>"},{i:"➡️",t:"Сразу к гелевому умыванию."}]},gel:{name:"Cleansing Gel",brand:"Умывание · 2-й этап",icon:"💧",instr:[{i:"🤲",t:"На <strong>влажную кожу</strong>, вспенить."},{i:"⏱️",t:"Массаж <strong>30–60 сек.</strong>"},{i:"💧",t:"<strong>Смыть прохладной водой.</strong>"},{i:"⏳",t:"<strong>30–60 сек</strong> подсохнуть перед тонером."}]},enzyme:{name:"Enzyme Powder",brand:"Энзимная пудра · мягкое очищение",icon:"🫧",instr:[{i:"🤲",t:"На <strong>влажные ладони</strong>, смочить водой."},{i:"⏱️",t:"Мягкий массаж <strong>60 сек.</strong>"},{i:"💧",t:"<strong>Смыть тёплой водой.</strong> Заменяет гель."},{i:"⏳",t:"<strong>30 сек</strong> перед тонером."}]},anua:{name:"Anua Toner",brand:"ANUA · центелла",icon:"🌿",instr:[{i:"🖐️",t:"На <strong>диск или ладони.</strong>"},{i:"🔁",t:"<strong>Патинг</strong> по всему лицу — не тереть."},{i:"⏳",t:"<strong>30–60 сек</strong> впитывание."}]},ultC:{name:"Ultra C Firming Serum",brand:"Ultraceuticals · витамин C",icon:"🍊",instr:[{i:"💧",t:"На <strong>чистую сухую кожу</strong> после тонера."},{i:"🖐️",t:"<strong>2–3 капли</strong>, похлопываниями."},{i:"⏳",t:"<strong>60–90 сек.</strong> Покалывание — норма."},{i:"🌞",t:"Только утром, под SPF."}]},ultB2:{name:"Ultra B2 Serum",brand:"Ultraceuticals · ниацинамид 10%",icon:"✨",instr:[{i:"🖐️",t:"<strong>2–3 капли</strong>, похлопываниями."},{i:"📍",t:"Акцент на <strong>Т-зону и нос</strong>."},{i:"⏳",t:"<strong>60 сек</strong> перед следующим шагом."}]},eye:{name:"Eye Cream",brand:"Крем для глаз",icon:"👁️",instr:[{i:"💛",t:"<strong>Размер горошины</strong> на оба глаза."},{i:"💆",t:"<strong>Безымянным пальцем</strong>, похлопывая по косточке."},{i:"⏳",t:"<strong>30 сек.</strong>"}]},spf:{name:"SPF Mattifying",brand:"Ultraceuticals · SPF 50",icon:"☀️",badge:"spf",instr:[{i:"🔢",t:"<strong>Последний шаг утра.</strong> Отдельный слой."},{i:"🖐️",t:"Лицо, шея, уши."},{i:"⏳",t:"<strong>10–15 мин</strong> до выхода."},{i:"🔄",t:"Обновлять <strong>каждые 2–3 ч</strong> на солнце."}]},retinal3:{name:"Crystal Retinal 3",brand:"Medik8 · ретинальдегид",icon:"💫",badge:"ret",instr:[{i:"⏳",t:"Через <strong>20–30 мин</strong> на сухую кожу."},{i:"🖐️",t:"<strong>Горошина</strong> на лицо. Обходить глаза и губы."},{i:"⏱️",t:"<strong>10–15 мин</strong>, затем крем (сэндвич)."},{i:"🌙",t:"<strong>Только вечером.</strong> Утром — SPF."}]},ultA:{name:"Ultra A Booster",brand:"Ultraceuticals · ретинальдегид",icon:"⭐",badge:"ret",instr:[{i:"⏳",t:"Через <strong>20–30 мин</strong>, кожа абсолютно сухая."},{i:"🖐️",t:"Немного. Обходить глаза и губы."},{i:"⏱️",t:"<strong>10–15 мин</strong>, затем крем (сэндвич)."},{i:"🌙",t:"<strong>Только вечером.</strong> Утром — SPF."}]},cosrxBHA:{name:"COSRX BHA 2%",brand:"COSRX · Blackhead Power Liquid",icon:"🌪️",badge:"acid",instr:[{i:"🧹",t:"<strong>После тонера</strong> на чистую кожу."},{i:"🖐️",t:"Тонкий слой на <strong>Т-зону, нос, лоб.</strong>"},{i:"⏱️",t:"Leave-on: <strong>экспозиция 20 мин.</strong>"},{i:"➡️",t:"Затем крем. Утром <strong>SPF 50.</strong>"}]},stMild:{name:"ST Serum Mild",brand:"Ultraceuticals · AHA молочная к-та",icon:"🌼",badge:"acid",instr:[{i:"🧹",t:"<strong>После тонера</strong> на чистую кожу."},{i:"🖐️",t:"<strong>Равномерно</strong> по всему лицу."},{i:"⏱️",t:"Leave-on: <strong>5–7 мин</strong>, затем крем."},{i:"⚠️",t:"Не с BHA или ретинолом в один вечер."}]},llPeeling:{name:"LL Peeling Cream",brand:"Holy Land Lactolan · AHA-пилинг",icon:"🌸",badge:"acid",instr:[{i:"🤲",t:"После Ma:nyo — <strong>заменяет гель.</strong>"},{i:"⏱️",t:"Круговые движения <strong>1–2 мин.</strong>"},{i:"💧",t:"<strong>Смыть.</strong> Сразу LL Mask."}]},llMask:{name:"LL Moist Cream (Mask)",brand:"Holy Land Lactolan · маска",icon:"🥛",instr:[{i:"🖐️",t:"<strong>Плотный слой</strong> на влажную кожу."},{i:"⏱️",t:"<strong>10–15 мин.</strong>"},{i:"💧",t:"<strong>Смыть.</strong> Далее тонер → глаза → крем. Без активов."}]},cosDeBAHA:{name:"Cos De BAHA AZ 10%",brand:"Cos De BAHA · азелаиновая + ниацинамид",icon:"🧊",badge:"azel",instr:[{i:"🧹",t:"<strong>После тонера.</strong>"},{i:"🖐️",t:"Несколько капель, акцент на <strong>нос и Т-зону.</strong>"},{i:"⏱️",t:"Leave-on: <strong>5–10 мин</strong>, затем крем."},{i:"💡",t:"Мягкий актив. Работает ночью под кремом."}]},clearMask:{name:"Ultra Clear Purifying Mask",brand:"Ultraceuticals · очищающая маска",icon:"💎",badge:"mask",instr:[{i:"🧹",t:"После Ma:nyo — <strong>до геля.</strong>"},{i:"🖐️",t:"Равномерный слой, обходить глаза."},{i:"⏱️",t:"<strong>10–15 мин.</strong>"},{i:"💧",t:"<strong>Смыть</strong>, затем гель → тонер → глаза → крем."}]},ultMoisturiser:{name:"Ultra Moisturiser Cream",brand:"Ultraceuticals",icon:"🌙",instr:[{i:"🖐️",t:"<strong>Финальный шаг.</strong> Все активы впитались."},{i:"🔁",t:"Похлопывания по лицу."},{i:"⏳",t:"После ретинола — ждать <strong>10–15 мин.</strong>"}]},madNight:{name:"M.A.D Night Cream",brand:"M.A.D Skincare · ночной",icon:"🌙",instr:[{i:"🖐️",t:"<strong>Финальный шаг</strong> — после азелаиновой или отдых."},{i:"💆",t:"Массажными движениями вбить."}]}};
+
+const TC={new:"tag-new",acid:"tag-acid",ret:"tag-ret",spf:"tag-spf",azel:"tag-azel",mask:"tag-mask"};
+const TL={new:"NEW",acid:"КИСЛОТА",ret:"РЕТИНОЛ",spf:"SPF",azel:"АЗЕЛАИК",mask:"МАСКА"};
+
+const DAYS={
+mon:{emoji:"💫",name:"Понедельник",label:"Ретинальдегид",am:["gel","anua","ultB2","eye","spf"],amT:"5–7",pm:["manyo","gel","anua","retinal3","eye","ultMoisturiser"],pmT:"40–55"},
+tue:{emoji:"🌪️",name:"Вторник",label:"BHA · салициловая",am:["gel","anua","ultC","ultB2","eye","spf"],amT:"7–9",pm:["manyo","gel","anua","cosrxBHA","eye","ultMoisturiser"],pmT:"27–30"},
+wed:{emoji:"🧊",name:"Среда",label:"Азелаиновая к-та",am:["enzyme","anua","ultB2","eye","spf"],amT:"5–7",pm:["manyo","gel","anua","cosDeBAHA","eye","ultMoisturiser"],pmT:"13–18"},
+thu:{emoji:"⭐",name:"Четверг",label:"Ретинальдегид",am:["gel","anua","ultC","ultB2","eye","spf"],amT:"7–9",pm:["manyo","gel","anua","ultA","eye","ultMoisturiser"],pmT:"40–55"},
+fri:{emoji:"🌪️",name:"Пятница",label:"BHA · салициловая",am:["gel","anua","ultB2","eye","spf"],amT:"5–7",pm:["manyo","gel","anua","cosrxBHA","eye","ultMoisturiser"],pmT:"27–30"},
+sat:{emoji:"🧊",name:"Суббота",label:"Азелаиновая к-та",am:["gel","anua","ultB2","eye","spf"],amT:"5–7",pm:["manyo","gel","anua","cosDeBAHA","eye","madNight"],pmT:"13–18"},
+sun:{emoji:"🔄",name:"Воскресенье",label:"Ротация",am:["gel","anua","ultC","ultB2","eye","spf"],amT:"7–9",pm_A:["manyo","clearMask","gel","anua","eye","ultMoisturiser"],pm_B:["manyo","llPeeling","llMask","anua","eye","ultMoisturiser"],pm_C:["manyo","gel","anua","stMild","eye","ultMoisturiser"],pmT_A:"20–25",pmT_B:"22–28",pmT_C:"13–15"}
+};
+
+const DK=['mon','tue','wed','thu','fri','sat','sun'];
+const DN=['Пн','Вт','Ср','Чт','Пт','Сб','Вс'];
+const DE=['💫','🌪️','🧊','⭐','🌪️','🧊','🔄'];
+const TM=['sun','mon','tue','wed','thu','fri','sat'];
+
+let S={day:'mon',time:'am',week:'A'};
+let openCards=new Set();
+
+// Auto-detect
+const now=new Date();
+const td=TM[now.getDay()];
+if(DAYS[td]) S.day=td;
+const sy=new Date(now.getFullYear(),0,1);
+S.week=['A','B','C'][Math.floor((now-sy)/(7*864e5))%3];
+
+// Build day pills
+const daysRow=document.getElementById('days-row');
+DK.forEach((k,i)=>{
+  const b=document.createElement('button');
+  b.className='day-pill'+(k===S.day?' on':'');
+  b.dataset.d=k;
+  b.innerHTML=`<span class="dp-icon">${DE[i]}</span><span class="dp-label">${DN[i]}</span>`;
+  b.onclick=()=>setDay(k);
+  daysRow.appendChild(b);
+});
+
+function setDay(d){S.day=d;openCards.clear();document.querySelectorAll('.day-pill').forEach(b=>b.classList.toggle('on',b.dataset.d===d));render();}
+function setTime(t){S.time=t;openCards.clear();document.getElementById('btn-am').classList.toggle('on',t==='am');document.getElementById('btn-pm').classList.toggle('on',t==='pm');applyTheme();render();}
+
+function applyTheme(){
+  const dark=S.time==='pm';
+  document.documentElement.classList.toggle('dark',dark);
+  document.querySelector('meta[name="theme-color"]')?.setAttribute('content',dark?'#1a1614':'#faf6f1');
+}
+function setWeek(w){S.week=w;document.querySelectorAll('.seg-week button').forEach((b,i)=>b.classList.toggle('on',['A','B','C'][i]===w));render();}
+function toggleCard(i){openCards.has(i)?openCards.delete(i):openCards.add(i);document.querySelector(`.scard[data-i="${i}"]`)?.classList.toggle('open',openCards.has(i));}
+
+function go(p){
+  document.querySelectorAll('.page').forEach(el=>el.classList.remove('active'));
+  document.getElementById('pg-'+p).classList.add('active');
+  document.querySelectorAll('.tabbar button').forEach((b,i)=>b.classList.toggle('on',i===(p==='routine'?0:1)));
+}
+
+function render(){
+  const d=DAYS[S.day];
+  const eve=S.time==='pm';
+  let keys,timeV;
+  if(eve&&S.day==='sun'){keys=d['pm_'+S.week];timeV=d['pmT_'+S.week];}
+  else if(eve){keys=d.pm;timeV=d.pmT;}
+  else{keys=d.am;timeV=d.amT;}
+
+  document.getElementById('seg-week').style.display=(S.day==='sun'&&eve)?'flex':'none';
+  const wl={A:'Неделя А',B:'Неделя Б',C:'Неделя В'};
+  document.getElementById('week-pill').textContent=wl[S.week];
+
+  const typeLabel=eve?d.label:(keys.includes('ultC')?'Витамин C + ниацинамид':(keys.includes('enzyme')?'Энзимная пудра':'Ниацинамид'));
+  const timeNote=eve?' · с экспозициями':'';
+
+  let weekChip='';
+  if(eve&&S.day==='sun'){
+    const wn={A:'Очищающая маска',B:'Lactolan пилинг + маска',C:'AHA-сыворотка'};
+    weekChip=`<div class="meta-chip week-chip">🔄 ${wn[S.week]}</div>`;
+  }
+
+  let h=`<div class="hero">
+    <div class="hero-day">${d.emoji} ${d.name}</div>
+    <div class="hero-type">${typeLabel}</div>
+    <div class="hero-meta"><div class="meta-chip">⏱ ${timeV} мин${timeNote}</div>${weekChip}</div>
+  </div><div class="steps-list ${eve?'evening':'morning'}">`;
+
+  keys.forEach((k,i)=>{
+    const p=P[k];if(!p)return;
+    const tag=p.badge?`<span class="tag ${TC[p.badge]}">${TL[p.badge]}</span>`:'';
+    const rows=p.instr.map(r=>`<div class="row"><span class="row-i">${r.i}</span><span class="row-t">${r.t}</span></div>`).join('');
+    h+=`<div class="scard${openCards.has(i)?' open':''}" data-i="${i}" onclick="toggleCard(${i})">
+      <div class="scard-top"><div class="scard-num">${i+1}</div><div class="scard-info"><div class="scard-name">${p.icon} ${p.name} ${tag}</div><div class="scard-brand">${p.brand}</div></div><div class="scard-arrow">›</div></div>
+      <div class="scard-body"><div class="scard-inner">${rows}</div></div></div>`;
+  });
+  h+='</div>';
+
+  if(eve){
+    h+=`<div class="legend-bar"><h4>Цикл · вечерние активы</h4><div class="legend-items">
+      <span><span class="tag tag-ret">РЕТИНОЛ</span> Пн·Чт</span>
+      <span><span class="tag tag-acid">КИСЛОТА</span> Вт·Пт</span>
+      <span><span class="tag tag-azel">АЗЕЛАИК</span> Ср·Сб</span>
+      <span><span class="tag tag-mask">РОТАЦИЯ</span> Вс</span>
+    </div></div>`;
+  }
+
+  document.getElementById('routine-out').innerHTML=h;
+
+  // Scroll active day into view
+  setTimeout(()=>{document.querySelector('.day-pill.on')?.scrollIntoView({behavior:'smooth',inline:'center',block:'nearest'});},50);
+}
+
+// Init week buttons
+document.querySelectorAll('.seg-week button').forEach((b,i)=>b.classList.toggle('on',['A','B','C'][i]===S.week));
+applyTheme();
+render();
+</script>
+</body>
+</html>

@@ -56,23 +56,33 @@ html.dark body::before{opacity:1;}
 .dark .glass-header{background:rgba(26,22,20,.88);}
 
 /* ── TITLE ROW ── */
-.title-row{display:flex;justify-content:space-between;align-items:center;margin-bottom:16px;}
+.title-row{display:flex;justify-content:space-between;align-items:center;margin-bottom:6px;}
 .logo{display:flex;align-items:baseline;gap:6px;}
 .logo-text{font-family:'Fraunces',serif;font-size:24px;font-weight:300;color:var(--text);letter-spacing:-.02em;transition:color .5s;}
 .logo-text i{font-style:italic;color:var(--accent);font-weight:300;transition:color .5s;}
-.week-pill{font-size:11px;font-weight:500;color:var(--accent);background:var(--accent-soft);padding:4px 10px;border-radius:20px;letter-spacing:.03em;transition:all .5s;}
 
-/* ── SEGMENTED CONTROL ── */
-.seg{display:flex;background:rgba(180,160,140,.12);border-radius:12px;padding:3px;margin-bottom:14px;transition:background .5s;}
-.dark .seg{background:rgba(100,80,60,.2);}
-.seg button{flex:1;padding:9px 0;border:none;border-radius:10px;background:transparent;font-family:'Outfit',sans-serif;font-size:13.5px;font-weight:400;color:var(--text2);cursor:pointer;transition:all .25s ease;position:relative;}
-.seg button.on{background:var(--card-solid);color:var(--text);font-weight:500;box-shadow:0 1px 8px rgba(0,0,0,.06),0 0 1px rgba(0,0,0,.1);}
-.dark .seg button.on{box-shadow:0 1px 8px rgba(0,0,0,.3),0 0 1px rgba(0,0,0,.4);}
-.seg-week{margin-bottom:14px;}
+.time-tog{display:flex;background:rgba(180,160,140,.12);border-radius:12px;padding:3px;gap:2px;transition:background .5s;}
+.dark .time-tog{background:rgba(100,80,60,.2);}
+.time-tog button{width:40px;height:34px;border:none;border-radius:9px;background:transparent;cursor:pointer;font-size:17px;line-height:1;display:flex;align-items:center;justify-content:center;transition:all .25s;}
+.time-tog button.on{background:var(--card-solid);box-shadow:0 1px 6px rgba(0,0,0,.06);}
+.dark .time-tog button.on{box-shadow:0 1px 6px rgba(0,0,0,.3);}
+
+/* ── DATE ROW ── */
+.date-row{display:flex;align-items:center;gap:8px;margin-bottom:14px;flex-wrap:wrap;}
+.date-text{font-size:13px;font-weight:400;color:var(--text2);transition:color .5s;}
+.date-text strong{font-weight:500;color:var(--text);transition:color .5s;}
+.week-pill{font-size:10px;font-weight:600;color:var(--accent);background:var(--accent-soft);padding:3px 9px;border-radius:20px;letter-spacing:.04em;text-transform:uppercase;transition:all .5s;}
+
+/* ── WEEK SEGMENTED CONTROL ── */
+.seg-week{display:flex;background:rgba(180,160,140,.12);border-radius:12px;padding:3px;margin-bottom:14px;transition:background .5s;}
+.dark .seg-week{background:rgba(100,80,60,.2);}
+.seg-week button{flex:1;padding:9px 0;border:none;border-radius:10px;background:transparent;font-family:'Outfit',sans-serif;font-size:13.5px;font-weight:400;color:var(--text2);cursor:pointer;transition:all .25s ease;}
+.seg-week button.on{background:var(--card-solid);color:var(--text);font-weight:500;box-shadow:0 1px 8px rgba(0,0,0,.06),0 0 1px rgba(0,0,0,.1);}
+.dark .seg-week button.on{box-shadow:0 1px 8px rgba(0,0,0,.3),0 0 1px rgba(0,0,0,.4);}
 
 /* ── DAY PILLS ── */
-.days{display:flex;gap:6px;padding:0 20px 14px 0;overflow-x:auto;scrollbar-width:none;-webkit-overflow-scrolling:touch;}
-.days::after{content:'';flex-shrink:0;width:1px;}
+.days{display:flex;gap:6px;padding:0 0 14px;overflow-x:auto;scrollbar-width:none;-webkit-overflow-scrolling:touch;}
+.days::after{content:'';flex-shrink:0;width:20px;}
 .days::-webkit-scrollbar{display:none;}
 .day-pill{flex-shrink:0;display:flex;flex-direction:column;align-items:center;gap:3px;padding:8px 14px;border-radius:16px;border:none;background:transparent;cursor:pointer;transition:all .25s ease;font-family:'Outfit',sans-serif;}
 .day-pill .dp-icon{font-size:16px;line-height:1;transition:transform .25s;}
@@ -233,13 +243,16 @@ html.dark body::before{opacity:1;}
       <div class="glass-header">
         <div class="title-row">
           <div class="logo"><span class="logo-text">skin <i>routine</i></span></div>
+          <div class="time-tog">
+            <button class="on" id="btn-am" onclick="setTime('am')">☀️</button>
+            <button id="btn-pm" onclick="setTime('pm')">🌙</button>
+          </div>
+        </div>
+        <div class="date-row">
+          <span class="date-text" id="date-text"></span>
           <div class="week-pill" id="week-pill"></div>
         </div>
-        <div class="seg">
-          <button class="on" id="btn-am" onclick="setTime('am')">☀️ Утро</button>
-          <button id="btn-pm" onclick="setTime('pm')">🌙 Вечер</button>
-        </div>
-        <div class="seg seg-week" id="seg-week" style="display:none">
+        <div class="seg-week" id="seg-week" style="display:none">
           <button class="on" onclick="setWeek('A')">А</button>
           <button onclick="setWeek('B')">Б</button>
           <button onclick="setWeek('C')">В</button>
@@ -343,6 +356,19 @@ function applyTheme(){
 }
 function setWeek(w){S.week=w;document.querySelectorAll('.seg-week button').forEach((b,i)=>b.classList.toggle('on',['A','B','C'][i]===w));render();}
 function toggleCard(i){openCards.has(i)?openCards.delete(i):openCards.add(i);document.querySelector(`.scard[data-i="${i}"]`)?.classList.toggle('open',openCards.has(i));}
+
+const MONTHS=['января','февраля','марта','апреля','мая','июня','июля','августа','сентября','октября','ноября','декабря'];
+const DAYNAMES=['воскресенье','понедельник','вторник','среда','четверг','пятница','суббота'];
+function updateClock(){
+  const n=new Date();
+  const h=String(n.getHours()).padStart(2,'0');
+  const m=String(n.getMinutes()).padStart(2,'0');
+  const dname=DAYNAMES[n.getDay()];
+  const el=document.getElementById('date-text');
+  if(el) el.innerHTML=`<strong>${n.getDate()} ${MONTHS[n.getMonth()]}</strong>, ${dname} · ${h}:${m}`;
+}
+updateClock();
+setInterval(updateClock,30000);
 
 function go(p){
   document.querySelectorAll('.page').forEach(el=>el.classList.remove('active'));

@@ -6,7 +6,8 @@
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <meta name="theme-color" content="#faf6f1">
-<link rel="apple-touch-icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>✨</text></svg>">
+<link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><defs><radialGradient id='g' cx='40%25' cy='30%25' r='65%25'><stop offset='0%25' stop-color='%23e8c4a0'/><stop offset='100%25' stop-color='%23c07848'/></radialGradient></defs><path d='M16 3C12 11 6 15 6 21a10 10 0 0020 0c0-6-6-10-10-18z' fill='url(%23g)'/><ellipse cx='12' cy='17' rx='2' ry='3.5' fill='rgba(255,255,255,.35)' transform='rotate(-20 12 17)'/></svg>">
+<link rel="apple-touch-icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><defs><radialGradient id='g' cx='40%25' cy='30%25' r='65%25'><stop offset='0%25' stop-color='%23e8c4a0'/><stop offset='100%25' stop-color='%23c07848'/></radialGradient></defs><rect width='100' height='100' rx='22' fill='%23faf0e8'/><path d='M50 10C40 32 18 44 18 62a32 32 0 0064 0c0-18-18-30-32-52z' fill='url(%23g)'/><ellipse cx='38' cy='54' rx='6' ry='11' fill='rgba(255,255,255,.35)' transform='rotate(-20 38 54)'/></svg>">
 <title>Skin Routine</title>
 <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600&family=Fraunces:ital,opsz,wght@0,9..144,300;0,9..144,400;1,9..144,300&display=swap" rel="stylesheet">
 <style>
@@ -52,7 +53,7 @@ html.dark body::before{opacity:1;}
 .page.active{opacity:1;transform:translateX(0);pointer-events:auto;min-height:100%;}
 
 /* ── GLASS HEADER ── */
-.glass-header{position:sticky;top:0;z-index:50;padding:max(env(safe-area-inset-top, 12px), 12px) 20px 0;background:rgba(250,246,241,.85);-webkit-backdrop-filter:blur(20px) saturate(1.5);backdrop-filter:blur(20px) saturate(1.5);border-bottom:1px solid var(--border);transition:background .5s ease;}
+.glass-header{position:sticky;top:0;z-index:50;padding:max(env(safe-area-inset-top, 12px), 12px) 20px 0;background:rgba(250,246,241,.85);-webkit-backdrop-filter:blur(20px) saturate(1.5);backdrop-filter:blur(20px) saturate(1.5);border-bottom:1px solid var(--border);transition:background .5s ease;overflow:hidden;}
 .dark .glass-header{background:rgba(26,22,20,.88);}
 
 /* ── TITLE ROW ── */
@@ -81,7 +82,7 @@ html.dark body::before{opacity:1;}
 .dark .seg-week button.on{box-shadow:0 1px 8px rgba(0,0,0,.3),0 0 1px rgba(0,0,0,.4);}
 
 /* ── DAY PILLS ── */
-.days{display:flex;gap:6px;padding:0 0 14px;overflow-x:auto;scrollbar-width:none;-webkit-overflow-scrolling:touch;}
+.days{display:flex;gap:6px;padding:0 20px 14px 4px;overflow-x:auto;scrollbar-width:none;-webkit-overflow-scrolling:touch;}
 .days::after{content:'';flex-shrink:0;width:20px;}
 .days::-webkit-scrollbar{display:none;}
 .day-pill{flex-shrink:0;display:flex;flex-direction:column;align-items:center;gap:3px;padding:8px 14px;border-radius:16px;border:none;background:transparent;cursor:pointer;transition:all .25s ease;font-family:'Outfit',sans-serif;}
@@ -328,12 +329,20 @@ const TM=['sun','mon','tue','wed','thu','fri','sat'];
 let S={day:'mon',time:'am',week:'A'};
 let openCards=new Set();
 
-// Auto-detect
+// Auto-detect day
 const now=new Date();
 const td=TM[now.getDay()];
 if(DAYS[td]) S.day=td;
-const sy=new Date(now.getFullYear(),0,1);
-S.week=['A','B','C'][Math.floor((now-sy)/(7*864e5))%3];
+
+// Auto-detect time: 6:00–18:00 = утро, 18:00–6:00 = вечер
+const h=now.getHours();
+S.time=(h>=6&&h<18)?'am':'pm';
+
+// Auto-detect week A/B/C: считаем от фиксированной опорной даты (понедельник)
+// Опорная дата: понедельник 2026-01-05 = неделя A
+const anchor=new Date('2026-01-05T00:00:00');
+const weeksSinceAnchor=Math.floor((now-anchor)/(7*864e5));
+S.week=['A','B','C'][((weeksSinceAnchor%3)+3)%3];
 
 // Build day pills
 const daysRow=document.getElementById('days-row');
@@ -424,12 +433,25 @@ function render(){
 
   document.getElementById('routine-out').innerHTML=h;
 
-  // Scroll active day into view
-  setTimeout(()=>{document.querySelector('.day-pill.on')?.scrollIntoView({behavior:'smooth',inline:'center',block:'nearest'});},50);
+  // Scroll active day into view — only within the days row, never touch page scroll
+  setTimeout(()=>{
+    const activeBtn = document.querySelector('.day-pill.on');
+    const daysEl = document.getElementById('days-row');
+    if(activeBtn && daysEl){
+      const btnLeft = activeBtn.offsetLeft;
+      const btnWidth = activeBtn.offsetWidth;
+      const containerWidth = daysEl.offsetWidth;
+      const scrollTarget = btnLeft - (containerWidth / 2) + (btnWidth / 2);
+      daysEl.scrollTo({left: Math.max(0, scrollTarget), behavior:'smooth'});
+    }
+  },50);
 }
 
 // Init week buttons
 document.querySelectorAll('.seg-week button').forEach((b,i)=>b.classList.toggle('on',['A','B','C'][i]===S.week));
+// Sync time buttons with auto-detected time
+document.getElementById('btn-am').classList.toggle('on',S.time==='am');
+document.getElementById('btn-pm').classList.toggle('on',S.time==='pm');
 applyTheme();
 render();
 </script>

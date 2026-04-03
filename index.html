@@ -6,7 +6,7 @@
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <meta name="theme-color" content="#faf6f1">
-<link rel="icon" type="image/png" sizes="32x32" href="icon.png"><defs><radialGradient id='g' cx='40%25' cy='30%25' r='65%25'><stop offset='0%25' stop-color='%23e8c4a0'/><stop offset='100%25' stop-color='%23c07848'/></radialGradient></defs><path d='M16 3C12 11 6 15 6 21a10 10 0 0020 0c0-6-6-10-10-18z' fill='url(%23g)'/><ellipse cx='12' cy='17' rx='2' ry='3.5' fill='rgba(255,255,255,.35)' transform='rotate(-20 12 17)'/></svg>">
+<link rel="icon" type="image/png" sizes="32x32" href="icon.png">
 <link rel="apple-touch-icon" sizes="180x180" href="icon.png">
 <title>Skin Routine</title>
 <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600&family=Fraunces:ital,opsz,wght@0,9..144,300;0,9..144,400;1,9..144,300&display=swap" rel="stylesheet">
@@ -226,7 +226,7 @@ html.dark body::before{opacity:1;}
 .tcard-text strong{color:var(--text);font-weight:500;}
 
 /* ── TAB BAR ── */
-.tabbar{display:flex;background:rgba(255,255,255,.9);-webkit-backdrop-filter:blur(24px) saturate(1.5);backdrop-filter:blur(24px) saturate(1.5);border-top:1px solid var(--border);padding:6px 0 max(8px, var(--safe-b));flex-shrink:0;transition:background .5s;}
+.tabbar{display:flex;background:rgba(255,255,255,.9);-webkit-backdrop-filter:blur(24px) saturate(1.5);backdrop-filter:blur(24px) saturate(1.5);border-top:1px solid var(--border);padding:8px 0 max(16px, env(safe-area-inset-bottom, 16px));flex-shrink:0;transition:background .5s;}
 .dark .tabbar{background:rgba(26,22,20,.92);}
 .tabbar button{flex:1;display:flex;flex-direction:column;align-items:center;gap:3px;padding:6px 0;border:none;background:transparent;cursor:pointer;font-family:'Outfit',sans-serif;transition:all .2s;}
 .tabbar .tb-icon{font-size:22px;line-height:1;transition:transform .2s;}
@@ -329,14 +329,30 @@ const TM=['sun','mon','tue','wed','thu','fri','sat'];
 let S={day:'mon',time:'am',week:'A'};
 let openCards=new Set();
 
-// Auto-detect day
+// Auto-detect day + time с учётом перехода через полночь:
+// 0:00–5:59 → вечер ВЧЕРАШНЕГО дня
+// 6:00–17:59 → утро СЕГОДНЯ
+// 18:00–23:59 → вечер СЕГОДНЯ
 const now=new Date();
-const td=TM[now.getDay()];
-if(DAYS[td]) S.day=td;
-
-// Auto-detect time: 6:00–18:00 = утро, 18:00–6:00 = вечер
 const h=now.getHours();
-S.time=(h>=6&&h<18)?'am':'pm';
+
+let displayDate;
+if(h>=0 && h<6){
+  // До 6 утра — считаем это "вечером вчера"
+  displayDate=new Date(now);
+  displayDate.setDate(displayDate.getDate()-1);
+  S.time='pm';
+} else if(h>=6 && h<18){
+  displayDate=now;
+  S.time='am';
+} else {
+  // 18:00–23:59 — вечер сегодня
+  displayDate=now;
+  S.time='pm';
+}
+
+const td=TM[displayDate.getDay()];
+if(DAYS[td]) S.day=td;
 
 // Auto-detect week A/B/C: считаем от фиксированной опорной даты (понедельник)
 // Опорная дата: понедельник 2026-01-05 = неделя A
@@ -370,11 +386,12 @@ const MONTHS=['января','февраля','марта','апреля','ма�
 const DAYNAMES=['воскресенье','понедельник','вторник','среда','четверг','пятница','суббота'];
 function updateClock(){
   const n=new Date();
-  const h=String(n.getHours()).padStart(2,'0');
-  const m=String(n.getMinutes()).padStart(2,'0');
+  const hStr=String(n.getHours()).padStart(2,'0');
+  const mStr=String(n.getMinutes()).padStart(2,'0');
+  // Дата всегда реальная текущая
   const dname=DAYNAMES[n.getDay()];
   const el=document.getElementById('date-text');
-  if(el) el.innerHTML=`<strong>${n.getDate()} ${MONTHS[n.getMonth()]}</strong>, ${dname} · ${h}:${m}`;
+  if(el) el.innerHTML=`<strong>${n.getDate()} ${MONTHS[n.getMonth()]}</strong>, ${dname} · ${hStr}:${mStr}`;
 }
 updateClock();
 setInterval(updateClock,30000);
